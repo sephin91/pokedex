@@ -1,7 +1,6 @@
 package com.seongmin.pokedex.data.model
 
 import kotlinx.serialization.Serializable
-import java.util.Locale
 
 @Serializable
 data class PokemonIndexInfo(
@@ -32,5 +31,9 @@ data class PokemonIndex(
     val imageUrl =
         "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$index.png"
 
-    val displayName = "${name.firstOrNull()?.toString().orEmpty().uppercase()}${name.drop(n = 1)}"
+    val displayName =
+        "${
+            name.firstOrNull()
+                ?.uppercaseChar() ?: ""
+        }${name.drop(n = 1)}"
 }
