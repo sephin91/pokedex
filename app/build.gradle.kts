@@ -78,6 +78,8 @@ dependencies {
 
     implementation(libs.io.coil.compose)
     implementation(libs.androidx.palette.ktx)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
 
     implementation(project(":data"))
 }

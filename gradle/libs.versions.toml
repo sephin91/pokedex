@@ -42,9 +42,9 @@ io-ktor-client-serialization-json = { group = "io.ktor", name = "ktor-serializat
 io-ktor-client-serialization-jvm = { group = "io.ktor", name = "ktor-client-serialization-jvm", version.ref = "ktor" }
 jetbrains-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.6.3" }
 io-ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 io-coil-compose = { module = "io.coil-kt:coil-compose", version = "2.6.0" }
+androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version = "3.3.1" }
+androidx-paging-compose = { module = "androidx-paging:paging-compose", version = "1.0.0" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
