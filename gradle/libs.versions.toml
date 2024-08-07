@@ -11,9 +11,8 @@ activityCompose = "1.9.0"
 composeBom = "2024.06.00"
 hilt = "2.48.1"
 ktor = "2.3.12"
-appcompat = "1.7.0"
-material = "1.12.0"
 paletteKtx = "1.0.0"
+pagingComposeAndroid = "3.3.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,8 +42,8 @@ io-ktor-client-serialization-jvm = { group = "io.ktor", name = "ktor-client-seri
 jetbrains-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.6.3" }
 io-ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 io-coil-compose = { module = "io.coil-kt:coil-compose", version = "2.6.0" }
-androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version = "3.3.1" }
-androidx-paging-compose = { module = "androidx-paging:paging-compose", version = "1.0.0" }
+androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "pagingComposeAndroid" }
+androidx-paging-compose-android = { module = "androidx.paging:paging-compose-android",version.ref = "pagingComposeAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

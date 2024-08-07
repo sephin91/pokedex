@@ -1,34 +1,24 @@
 package com.seongmin.pokedex.data
 
-import com.seongmin.pokedex.data.model.PokemonIndexInfo
-import com.seongmin.pokedex.network.NetworkClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.parameter
-import io.ktor.http.path
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.seongmin.pokedex.data.model.Const
+import com.seongmin.pokedex.data.model.PokemonIndex
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class PokeDexRepositoryImpl @Inject constructor(private val networkClient: NetworkClient) :
+class PokeDexRepositoryImpl @Inject constructor(private val pokeDexDataSource: PokeDexDataSource) :
     PokeDexRepository {
-    override suspend fun getPokemonIndexInfo(): PokemonIndexInfo {
-        val response = networkClient.client.get {
-            url {
-                path(POKE_MON_LIST)
-                parameter(
-                    key = "limit",
-                    value = "10000"
-                )
+    override suspend fun getPokemonIndexInfo(): Flow<PagingData<PokemonIndex>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = Const.MAX_COUNT,
+                prefetchDistance = Const.PREFETCH_DISTANCE
+            ),
+            pagingSourceFactory = {
+                PokeDexPagingSource(pokeDexDataSource)
             }
-        }
-
-        if (response.status.value in 200..299) {
-            return response.body()
-        } else {
-            throw Exception()
-        }
-    }
-
-    companion object {
-        private const val POKE_MON_LIST = "/api/v2/pokemon"
+        ).flow
     }
 }

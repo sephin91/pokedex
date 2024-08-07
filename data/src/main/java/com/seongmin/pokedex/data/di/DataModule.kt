@@ -1,5 +1,7 @@
 package com.seongmin.pokedex.data.di
 
+import com.seongmin.pokedex.data.PokeDexDataSource
+import com.seongmin.pokedex.data.PokeDexDataSourceImpl
 import com.seongmin.pokedex.data.PokeDexRepository
 import com.seongmin.pokedex.data.PokeDexRepositoryImpl
 import dagger.Binds
@@ -14,4 +16,8 @@ internal interface DataModule {
     @Binds
     @Singleton
     fun bindsPokeDexRepository(pokeDexRepositoryImpl: PokeDexRepositoryImpl): PokeDexRepository
+
+    @Binds
+    @Singleton
+    fun bindsPokeDexDatasource(pokeDexDataSourceImpl: PokeDexDataSourceImpl): PokeDexDataSource
 }

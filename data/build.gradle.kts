@@ -53,6 +53,8 @@ dependencies {
 
     implementation(libs.jetbrains.kotlinx.serialization.json)
 
+    implementation(libs.androidx.paging.runtime)
+
     implementation(project(":network"))
 }
 

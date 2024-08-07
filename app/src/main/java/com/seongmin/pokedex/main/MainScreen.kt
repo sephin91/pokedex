@@ -13,13 +13,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.palette.graphics.Palette
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
-    val state by viewModel.state.collectAsState()
+    val pagingData = viewModel.pagingData.collectAsLazyPagingItems()
 
     OnLifecycleEvent(
         handler = LifecycleHandler(
@@ -65,7 +65,7 @@ fun MainScreen(viewModel: MainViewModel) {
                     .padding(paddingValues = innerPadding)
                     .fillMaxSize()
                     .background(color = Color.Black),
-                items = state.pokemonIndexInfo.results
+                items = pagingData
             )
         }
     }
@@ -74,7 +74,7 @@ fun MainScreen(viewModel: MainViewModel) {
 @Composable
 fun Grid(
     modifier: Modifier,
-    items: List<PokemonIndex>
+    items: LazyPagingItems<PokemonIndex>
 ) {
     LazyVerticalGrid(
         modifier = modifier.padding(all = 8.dp),
@@ -82,11 +82,11 @@ fun Grid(
         verticalArrangement = Arrangement.spacedBy(space = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(space = 8.dp)
     ) {
-        items(items = items) { pokemonIndex ->
+        items(count = items.itemCount) { index ->
             PokemonIndex(
                 modifier = Modifier.fillMaxWidth(),
-                imageUrl = pokemonIndex.imageUrl,
-                name = pokemonIndex.displayName
+                imageUrl = items[index]?.imageUrl.orEmpty(),
+                name = items[index]?.displayName.orEmpty()
             )
         }
     }
