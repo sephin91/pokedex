@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.seongmin.pokedex.data.model.Const
+import com.seongmin.pokedex.data.model.Pokemon
 import com.seongmin.pokedex.data.model.PokemonIndex
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -20,5 +21,9 @@ class PokeDexRepositoryImpl @Inject constructor(private val pokeDexDataSource: P
                 PokeDexPagingSource(pokeDexDataSource)
             }
         ).flow
+    }
+
+    override suspend fun getPokemonDetail(name: String): Pokemon {
+        return pokeDexDataSource.getPokemonDetail(name = name)
     }
 }

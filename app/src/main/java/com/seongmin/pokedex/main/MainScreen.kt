@@ -2,7 +2,6 @@ package com.seongmin.pokedex.main
 
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -64,7 +63,9 @@ fun MainScreen(viewModel: MainViewModel) {
 
     OnViewSideEffectChanged(sideEffect = viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
-            is MainContract.SideEffect.MoveToDetail -> {}
+            is MainContract.SideEffect.ShowDetail -> {
+
+            }
         }
     }
 
@@ -145,7 +146,7 @@ fun PokemonIndex(
             getBlendedColor(
                 originColor = Color(color = getDominantColor(it)),
                 blendColor = Black,
-                ratio = 0.3f
+                ratio = 0.5f
             )
         } else {
             color

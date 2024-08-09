@@ -46,8 +46,17 @@ class MainViewModel @Inject constructor(
     }
 
     private fun onClickPokemonIndex(pokemonIndex: PokemonIndex) {
-        setSideEffect {
-            MainContract.SideEffect.MoveToDetail(pokemonIndex = pokemonIndex)
+        getPokemonDetail(pokemonIndex = pokemonIndex)
+    }
+
+    private fun getPokemonDetail(pokemonIndex: PokemonIndex) {
+        viewModelScope.launch {
+            val detail = pokeDexRepository.getPokemonDetail(name = pokemonIndex.name)
+                .copy(imageUrl = pokemonIndex.imageUrl)
+
+            setSideEffect {
+                MainContract.SideEffect.ShowDetail(detail = detail)
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.seongmin.pokedex.data
 
 import com.seongmin.pokedex.data.model.Const
+import com.seongmin.pokedex.data.model.Pokemon
 import com.seongmin.pokedex.data.model.PokemonIndexInfo
 import com.seongmin.pokedex.network.NetworkClient
 import io.ktor.client.call.body
@@ -27,6 +28,19 @@ class PokeDexDataSourceImpl @Inject constructor(private val networkClient: Netwo
             }
         }
 
+        if (response.status.isSuccess()) {
+            return response.body()
+        } else {
+            throw Exception()
+        }
+    }
+
+    override suspend fun getPokemonDetail(name: String): Pokemon {
+        val response = networkClient.client.get {
+            url {
+                path(POKE_MON_DETAIL.format(name))
+            }
+        }
 
         if (response.status.isSuccess()) {
             return response.body()
@@ -37,5 +51,6 @@ class PokeDexDataSourceImpl @Inject constructor(private val networkClient: Netwo
 
     companion object {
         private const val POKE_MON_LIST = "/api/v2/pokemon"
+        private const val POKE_MON_DETAIL = "/api/v2/pokemon/%s"
     }
 }
