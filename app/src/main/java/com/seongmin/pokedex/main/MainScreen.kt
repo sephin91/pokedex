@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +42,7 @@ import coil.request.SuccessResult
 import com.seongmin.pokedex.base.LifecycleHandler
 import com.seongmin.pokedex.base.OnLifecycleEvent
 import com.seongmin.pokedex.data.model.PokemonIndex
+import com.seongmin.pokedex.ui.theme.Black
 import com.seongmin.pokedex.ui.theme.PokeDexTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -63,8 +66,7 @@ fun MainScreen(viewModel: MainViewModel) {
             Grid(
                 modifier = Modifier
                     .padding(paddingValues = innerPadding)
-                    .fillMaxSize()
-                    .background(color = Color.Black),
+                    .fillMaxSize(),
                 items = pagingData
             )
         }
@@ -122,8 +124,19 @@ fun PokemonIndex(
         }
     }
 
-    val dominantColor = palette.getColor(defaultColor = Color.Black) {
-        Color(getDominantColor(it))
+    val isDarkMode = isSystemInDarkTheme()
+
+    val dominantColor = palette.getColor(defaultColor = MaterialTheme.colorScheme.background) {
+        val color = Color(color = getDominantColor(it))
+        if (isDarkMode) {
+            getBlendedColor(
+                originColor = Color(color = getDominantColor(it)),
+                blendColor = Black,
+                ratio = 0.3f
+            )
+        } else {
+            color
+        }
     }
 
     Column(
@@ -164,7 +177,6 @@ fun PokemonIndex(
     }
 }
 
-
 private fun getTextColorForBackground(backgroundColor: Color): Color {
     val r = (backgroundColor.red * 255).toInt()
     val g = (backgroundColor.green * 255).toInt()
@@ -180,4 +192,22 @@ private fun Palette?.getColor(
     block: Palette.(Int) -> Color
 ): Color {
     return this?.block(defaultColor.toArgb()) ?: defaultColor
+}
+
+fun getBlendedColor(
+    originColor: Color,
+    blendColor: Color,
+    ratio: Float
+): Color {
+    val inverseRatio = 1 - ratio
+    val red = (originColor.red * ratio) + (blendColor.red * inverseRatio)
+    val green = (originColor.green * ratio) + (blendColor.green * inverseRatio)
+    val blue = (originColor.blue * ratio) + (blendColor.blue * inverseRatio)
+    val alpha = (originColor.alpha * ratio) + (blendColor.alpha * inverseRatio)
+    return Color(
+        red,
+        green,
+        blue,
+        alpha
+    )
 }
