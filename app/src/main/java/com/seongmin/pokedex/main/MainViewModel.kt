@@ -26,7 +26,10 @@ class MainViewModel @Inject constructor(
     override fun handleEvents(event: MainContract.Event) {
         when (event) {
             MainContract.Event.OnCreate -> onCreate()
-            is MainContract.Event.OnClickPokemonIndex -> onClickPokemonIndex(pokemonIndex = event.pokemonIndex)
+            is MainContract.Event.OnClickPokemonIndex -> onClickPokemonIndex(
+                pokemonIndex = event.pokemonIndex,
+                color = event.color
+            )
         }
     }
 
@@ -45,17 +48,33 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun onClickPokemonIndex(pokemonIndex: PokemonIndex) {
-        getPokemonDetail(pokemonIndex = pokemonIndex)
+    private fun onClickPokemonIndex(
+        pokemonIndex: PokemonIndex,
+        color: Int
+    ) {
+        getPokemonDetail(
+            pokemonIndex = pokemonIndex,
+            color = color
+        )
     }
 
-    private fun getPokemonDetail(pokemonIndex: PokemonIndex) {
+    private fun getPokemonDetail(
+        pokemonIndex: PokemonIndex,
+        color: Int
+    ) {
         viewModelScope.launch {
             val detail = pokeDexRepository.getPokemonDetail(name = pokemonIndex.name)
-                .copy(imageUrl = pokemonIndex.imageUrl)
+                .copy(
+                    imageUrl = pokemonIndex.imageUrl,
+                    dominantColor = color
+                )
+
+            setState {
+                copy(pokemon = detail)
+            }
 
             setSideEffect {
-                MainContract.SideEffect.ShowDetail(detail = detail)
+                MainContract.SideEffect.ShowDetail
             }
         }
     }

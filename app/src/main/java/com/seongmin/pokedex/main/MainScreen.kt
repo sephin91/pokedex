@@ -16,11 +16,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,9 +53,16 @@ import com.seongmin.pokedex.ui.theme.PokeDexTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var hasBottomSheet by remember {
+        mutableStateOf(false)
+    }
+
     val pagingData = viewModel.pagingData.collectAsLazyPagingItems()
+    val state by viewModel.state.collectAsState()
 
     OnLifecycleEvent(
         handler = LifecycleHandler(
@@ -64,22 +75,37 @@ fun MainScreen(viewModel: MainViewModel) {
     OnViewSideEffectChanged(sideEffect = viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
             is MainContract.SideEffect.ShowDetail -> {
-
+                hasBottomSheet = true
             }
         }
     }
 
     PokeDexTheme {
-        Scaffold(
-            modifier = Modifier.fillMaxSize()
-        ) { innerPadding ->
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             Grid(
                 modifier = Modifier
-                    .padding(paddingValues = innerPadding)
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(paddingValues = innerPadding),
                 items = pagingData,
                 onEventSent = viewModel::setEvent
             )
+        }
+
+        if (hasBottomSheet) {
+            ModalBottomSheet(
+                modifier = Modifier.fillMaxSize(),
+                sheetState = bottomSheetState,
+                onDismissRequest = {
+                    hasBottomSheet = false
+                },
+                containerColor = Color(state.pokemon.dominantColor)
+            ) {
+                PokemonDetailBottomSheet(
+                    modifier = Modifier.fillMaxSize(),
+                    pokemon = state.pokemon,
+                    isVisible = bottomSheetState.isVisible
+                )
+            }
         }
     }
 }
@@ -100,8 +126,14 @@ fun Grid(
             PokemonIndex(
                 modifier = Modifier.fillMaxWidth(),
                 pokemonIndex = items[index] ?: PokemonIndex(),
-                onClick = { pokemonIndex ->
-                    onEventSent(MainContract.Event.OnClickPokemonIndex(pokemonIndex = pokemonIndex))
+                onClick = { pokemonIndex, color ->
+                    onEventSent(
+                        MainContract.Event.OnClickPokemonIndex(
+                            pokemonIndex =
+                            pokemonIndex,
+                            color = color
+                        )
+                    )
                 }
             )
         }
@@ -112,7 +144,7 @@ fun Grid(
 fun PokemonIndex(
     modifier: Modifier,
     pokemonIndex: PokemonIndex,
-    onClick: (PokemonIndex) -> Unit = {}
+    onClick: (PokemonIndex, Int) -> Unit
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -162,7 +194,10 @@ fun PokemonIndex(
                 shape = RoundedCornerShape(size = 8.dp)
             )
             .clickable {
-                onClick(pokemonIndex)
+                onClick(
+                    pokemonIndex,
+                    dominantColor.toArgb()
+                )
             }
     ) {
         val imageModifier = Modifier
@@ -194,7 +229,7 @@ fun PokemonIndex(
     }
 }
 
-private fun getTextColorForBackground(backgroundColor: Color): Color {
+fun getTextColorForBackground(backgroundColor: Color): Color {
     val r = (backgroundColor.red * 255).toInt()
     val g = (backgroundColor.green * 255).toInt()
     val b = (backgroundColor.blue * 255).toInt()
