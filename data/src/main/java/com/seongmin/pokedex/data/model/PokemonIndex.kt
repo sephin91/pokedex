@@ -13,7 +13,7 @@ data class PokemonIndexInfo(
 @Serializable
 data class PokemonIndex(
     val name: String = "",
-    val url: String = ""
+    val url: String = "",
 ) {
     private val index = url.split("/")
         .let { pathList ->

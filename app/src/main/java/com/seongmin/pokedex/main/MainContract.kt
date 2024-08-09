@@ -3,6 +3,7 @@ package com.seongmin.pokedex.main
 import com.seongmin.pokedex.base.BaseEvent
 import com.seongmin.pokedex.base.BaseSideEffect
 import com.seongmin.pokedex.base.BaseState
+import com.seongmin.pokedex.data.model.PokemonIndex
 import com.seongmin.pokedex.data.model.PokemonIndexInfo
 
 class MainContract {
@@ -13,7 +14,10 @@ class MainContract {
 
     sealed class Event : BaseEvent {
         data object OnCreate : Event()
+        data class OnClickPokemonIndex(val pokemonIndex: PokemonIndex) : Event()
     }
 
-    sealed class SideEffect : BaseSideEffect
+    sealed class SideEffect : BaseSideEffect {
+        data class MoveToDetail(val pokemonIndex: PokemonIndex) : SideEffect()
+    }
 }

@@ -2,8 +2,10 @@ package com.seongmin.pokedex.main
 
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,6 +43,7 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.seongmin.pokedex.base.LifecycleHandler
 import com.seongmin.pokedex.base.OnLifecycleEvent
+import com.seongmin.pokedex.base.OnViewSideEffectChanged
 import com.seongmin.pokedex.data.model.PokemonIndex
 import com.seongmin.pokedex.ui.theme.Black
 import com.seongmin.pokedex.ui.theme.PokeDexTheme
@@ -59,6 +62,12 @@ fun MainScreen(viewModel: MainViewModel) {
         )
     )
 
+    OnViewSideEffectChanged(sideEffect = viewModel.sideEffect) { sideEffect ->
+        when (sideEffect) {
+            is MainContract.SideEffect.MoveToDetail -> {}
+        }
+    }
+
     PokeDexTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize()
@@ -67,7 +76,8 @@ fun MainScreen(viewModel: MainViewModel) {
                 modifier = Modifier
                     .padding(paddingValues = innerPadding)
                     .fillMaxSize(),
-                items = pagingData
+                items = pagingData,
+                onEventSent = viewModel::setEvent
             )
         }
     }
@@ -76,7 +86,8 @@ fun MainScreen(viewModel: MainViewModel) {
 @Composable
 fun Grid(
     modifier: Modifier,
-    items: LazyPagingItems<PokemonIndex>
+    items: LazyPagingItems<PokemonIndex>,
+    onEventSent: (MainContract.Event) -> Unit
 ) {
     LazyVerticalGrid(
         modifier = modifier.padding(all = 8.dp),
@@ -87,8 +98,10 @@ fun Grid(
         items(count = items.itemCount) { index ->
             PokemonIndex(
                 modifier = Modifier.fillMaxWidth(),
-                imageUrl = items[index]?.imageUrl.orEmpty(),
-                name = items[index]?.displayName.orEmpty()
+                pokemonIndex = items[index] ?: PokemonIndex(),
+                onClick = { pokemonIndex ->
+                    onEventSent(MainContract.Event.OnClickPokemonIndex(pokemonIndex = pokemonIndex))
+                }
             )
         }
     }
@@ -97,17 +110,17 @@ fun Grid(
 @Composable
 fun PokemonIndex(
     modifier: Modifier,
-    imageUrl: String,
-    name: String
+    pokemonIndex: PokemonIndex,
+    onClick: (PokemonIndex) -> Unit = {}
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var bitmap by remember { mutableStateOf<Bitmap?>(value = null) }
     var palette by remember { mutableStateOf<Palette?>(value = null) }
 
-    LaunchedEffect(imageUrl) {
+    LaunchedEffect(pokemonIndex.imageUrl) {
         val request = ImageRequest.Builder(context = context)
-            .data(data = imageUrl)
+            .data(data = pokemonIndex.imageUrl)
             .allowHardware(enable = false)
             .build()
 
@@ -147,6 +160,9 @@ fun PokemonIndex(
                 color = dominantColor,
                 shape = RoundedCornerShape(size = 8.dp)
             )
+            .clickable {
+                onClick(pokemonIndex)
+            }
     ) {
         val imageModifier = Modifier
             .fillMaxSize()
@@ -169,7 +185,7 @@ fun PokemonIndex(
                     end = 8.dp
                 ),
             maxLines = 1,
-            text = name,
+            text = pokemonIndex.displayName,
             color = getTextColorForBackground(backgroundColor = dominantColor),
             textAlign = TextAlign.Center,
             overflow = TextOverflow.Ellipsis

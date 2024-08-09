@@ -26,6 +26,7 @@ class MainViewModel @Inject constructor(
     override fun handleEvents(event: MainContract.Event) {
         when (event) {
             MainContract.Event.OnCreate -> onCreate()
+            is MainContract.Event.OnClickPokemonIndex -> onClickPokemonIndex(pokemonIndex = event.pokemonIndex)
         }
     }
 
@@ -41,6 +42,12 @@ class MainViewModel @Inject constructor(
                 .collect { data ->
                     _pagingData.value = data
                 }
+        }
+    }
+
+    private fun onClickPokemonIndex(pokemonIndex: PokemonIndex) {
+        setSideEffect {
+            MainContract.SideEffect.MoveToDetail(pokemonIndex = pokemonIndex)
         }
     }
 }
